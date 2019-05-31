@@ -1,9 +1,9 @@
 :root {
-    --amber: orange;
-    --yellow: yellow;
-    --red: red;
-    --green: green;
-    --black: #333333;
+    --amber: #f2961f;
+    --yellow: #ffc658;
+    --red: #ee2737;
+    --green: #509e2f;
+    --black: #353535;
     --box-size: 76px;
     --slide-height: calc(var(--box-size) * 2);
     --lfo-color: var(--green);
@@ -11,9 +11,9 @@
     --vca-color: var(--red);
     --vcf-color: var(--yellow);
     --cho-color: var(--black);
-    --env-color: #666666;
-    --btn-color: #246;
-    --black-key: #333;
+    --env-color: #333f48;
+    --btn-color: #4f758b;
+    --black-key: var(--black);
     --white-key: #eee;
 }
 
@@ -23,14 +23,16 @@ body {
     font-family: sans-serif;
     font-size: 16px;
     margin: 0 auto;
-    width: calc(var(--box-size) * 10); // constrain the width
+    width: calc(var(--box-size) * 10);
+    /* constrain the width */
 }
 
 .controls {
     background-color: var(--env-color);
     border: 1px transparent solid;
+    border-radius: 4px;
     color: #fff;
-    text-shadow: 0 0 3px #333;
+    text-shadow: 0 0 2px #333;
     display: inline-block;
     margin: .3rem .5rem;
     position: relative;
@@ -58,7 +60,7 @@ body {
 }
 
 .button:active {
-    background-color: red;
+    background-color: var(--red);
 }
 
 .controls>input[type="range"] {
@@ -76,7 +78,7 @@ body {
 .controls>label {
     color: #fff;
     font-size: .7rem;
-    font-weight: 700;
+    font-weight: 400;
     position: absolute;
     top: 2px;
     left: 2px;
@@ -111,7 +113,7 @@ body {
 
 .value {
     font-weight: 700;
-    color: pink;
+    color: var(--amber);
 }
 
 .logo {

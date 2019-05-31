@@ -1,322 +1,5 @@
-const RANGE_FULL = [...Array(128).keys()];
-const RANGE_4 = [...Array(4).keys()];
-const RANGE_6 = [...Array(6).keys()];
-const RANGE_ON_OFF = [...Array(2).keys()]; // on/off or toggle
-const OCTAVE = ["oct -", "C#", "D#", "", "F#", "G#", "A#", "oct +", "C", "D", "E", "F", "G", "A", "B", "C"];
-
-const VEL_OFF = 0;
-const VEL_L_RED = 13;
-const VEL_D_RED = 15;
-const VEL_L_AMBER = 29;
-const VEL_D_AMBER = 63;
-const VEL_YELLOW = 62;
-const VEL_L_GREEN = 28;
-const VEL_D_GREEN = 60;
-
 let current_octave = 4;
-
-const noteMap = {
-    41: {
-        note: ""
-    },
-    42: {
-        note: "C#"
-    },
-    43: {
-        note: "D#"
-    },
-    44: {
-        note: ""
-    },
-    57: {
-        note: "F#"
-    },
-    58: {
-        note: "G#"
-    },
-    59: {
-        note: "A#"
-    },
-    60: {
-        note: ""
-    },
-    73: {
-        note: "C"
-    },
-    74: {
-        note: "D"
-    },
-    75: {
-        note: "E"
-    },
-    76: {
-        note: "F"
-    },
-    89: {
-        note: "G"
-    },
-    90: {
-        note: "A"
-    },
-    91: {
-        note: "B"
-    },
-    92: {
-        note: "C"
-    },
-    105: {
-        note: ""
-    },
-};
-
-const ccMap = {
-    13: {
-        name: 'LFO RATE',
-        sysex: '18',
-        desc: 'LFO Rate (0..7F)',
-        type: 'lfo',
-        range: RANGE_FULL
-    },
-    14: {
-        name: 'LFO DELAY',
-        sysex: '19',
-        desc: 'LFO Delay (0..7F)',
-        type: 'lfo',
-        range: RANGE_FULL
-    },
-    15: {
-        name: 'DCO RANGE',
-        sysex: '06',
-        desc: 'DCO Range (0=4\', 1=8\', 2=16\', 3=32\')',
-        type: 'dco',
-        range: RANGE_4
-    },
-    16: {
-        name: 'DCO LFO',
-        sysex: '0B',
-        desc: 'DCO LFO Mod. (0..7F)',
-        type: 'dco',
-        range: RANGE_FULL
-    },
-    17: {
-        name: 'DCO ENV',
-        sysex: '0C',
-        desc: 'DCO ENV Mod. (0..7F)',
-        type: 'dco',
-        range: RANGE_FULL
-    },
-    18: {
-        name: 'DCO ENV MODE',
-        sysex: '01',
-        desc: 'DCO Env. Mode (0=Normal, 1=Inverted, 2=Normal-Dynamic, 3=Inv.-Dynamic)',
-        type: 'dco',
-        range: RANGE_4
-    },
-    19: {
-        name: 'VCA LEVEL',
-        sysex: '16',
-        desc: 'VCA Level (0..7F)',
-        type: 'vca',
-        range: RANGE_FULL
-    },
-    20: {
-        name: 'VCA ENV MODE',
-        sysex: '02',
-        desc: 'VCA Env. Mode (0=Normal, 1=Gate, 2=Normal-Dynamic, 3=Gate-Dynamic)',
-        type: 'vca',
-        range: RANGE_4
-    },
-    29: {
-        name: 'PULSE',
-        sysex: '03',
-        desc: 'DCO Wave Pulse (0..3)',
-        type: 'dco',
-        range: RANGE_4
-    },
-    30: {
-        name: 'SAW TOOTH',
-        sysex: '04',
-        desc: 'DCO Wave Saw (0..5)',
-        type: 'dco',
-        range: RANGE_6
-    },
-    31: {
-        name: 'SUB',
-        sysex: '05',
-        desc: 'DCO Wave Sub (0..5)',
-        type: 'dco',
-        range: RANGE_6
-    },
-    32: {
-        name: 'SUB LEVEL',
-        sysex: '07',
-        desc: 'DCO Sub Level (0..3)',
-        type: 'dco',
-        range: RANGE_4
-    },
-    33: {
-        name: 'NOISE LEVEL',
-        sysex: '08',
-        desc: 'DCO Noise (0..3)',
-        type: 'dco',
-        range: RANGE_4
-    },
-    34: {
-        name: 'PWM',
-        sysex: '0E',
-        desc: '	DCO PWM Depth (0..7F)',
-        type: 'dco',
-        range: RANGE_FULL
-    },
-    35: {
-        name: 'PWM RATE',
-        sysex: '0F',
-        desc: 'DCO PWM Rate (0..7F) 0 = Pulse Width Manual 1..7F = PW LFO Rate',
-        type: 'dco',
-        range: RANGE_FULL
-    },
-    36: {
-        name: 'CHORUS ON/OFF',
-        sysex: '0A',
-        desc: 'Chorus Switch (0=Off, 1=On)',
-        type: 'cho',
-        range: RANGE_ON_OFF
-    },
-    49: {
-        name: 'HPF',
-        sysex: '09',
-        desc: 'HPF Cutoff (0..3)',
-        type: 'vcf',
-        range: RANGE_4
-    },
-    50: {
-        name: 'FREQ',
-        sysex: '10',
-        desc: 'VCF Cutoff (0..7F)',
-        type: 'vcf',
-        range: RANGE_FULL
-    },
-    51: {
-        name: 'RES',
-        sysex: '11',
-        desc: 'VCF Resonance (0..7F)',
-        type: 'vcf',
-        range: RANGE_FULL
-    },
-    52: {
-        name: 'VCF LFO',
-        sysex: '12',
-        desc: 'VCF LFO Mod. (0..7F)',
-        type: 'vcf',
-        range: RANGE_FULL
-    },
-    53: {
-        name: 'VCF ENV',
-        sysex: '13',
-        desc: 'VCF ENV Mod. (0..7F)',
-        type: 'vcf',
-        range: RANGE_FULL
-    },
-    54: {
-        name: 'VCF ENV MODE',
-        sysex: '01',
-        desc: 'VCF Env. Mode (0=Normal, 1=Inverted, 2=Normal-Dynamic, 3=Dynamic)',
-        type: 'vcf',
-        range: RANGE_4
-    },
-    55: {
-        name: 'VCF KEY FOLLOW',
-        sysex: '14',
-        desc: 'VCF Key Follow (0..7F)',
-        type: 'vcf',
-        range: RANGE_FULL
-    },
-    56: {
-        name: 'CHORUS RATE',
-        sysex: '22',
-        desc: 'Chorus Rate (0..7F)',
-        type: 'cho',
-        range: RANGE_FULL
-    },
-    77: {
-        name: 'ATTACK TIME',
-        sysex: '1A',
-        desc: 'ENV T1 (0..7F) Attack Time',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    78: {
-        name: 'ATTACK LEVEL',
-        sysex: '1B',
-        desc: 'ENV L1 (0..7F) Attack Level',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    79: {
-        name: 'BREAK TIME',
-        sysex: '1C',
-        desc: 'ENV T2 (0..7F) Break Time',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    80: {
-        name: 'BREAK LEVEL',
-        sysex: '1D',
-        desc: 'ENV L2 (0..7F) Break Level',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    81: {
-        name: 'DECAY',
-        sysex: '1E',
-        desc: 'ENV T3 (0..7F) Decay Time',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    82: {
-        name: 'SUSTAIN',
-        sysex: '1F',
-        desc: 'ENV L3 (0..7F) Sustain Level',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    83: {
-        name: 'RELEASE',
-        sysex: '20',
-        desc: 'ENV T4 (0..7F) Release Time',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    84: {
-        name: 'KEY FOLLOW',
-        sysex: '21',
-        desc: 'ENV Key Follow (0..7F)',
-        type: 'env',
-        range: RANGE_FULL
-    },
-    97: {
-        name: 'DCO Aftertouch',
-        sysex: '0D',
-        desc: 'DOC After Mod. (0..7F)',
-        type: 'dco',
-        range: RANGE_FULL
-    },
-    98: {
-        name: 'VCF Aftertouch',
-        sysex: '15',
-        desc: 'VCF Aftertouch (0..7F)',
-        type: 'vcf',
-        range: RANGE_FULL
-    },
-    99: {
-        name: 'VCA Aftertouch',
-        sysex: '17',
-        desc: 'VCA Aftertouch (0..7F)',
-        type: 'vca',
-        range: RANGE_FULL
-    }
-};
-
+let channel = 9;
 let programmer, juno, launchResponse;
 
 function panic() {
@@ -324,16 +7,16 @@ function panic() {
 }
 
 function buildUI() {
-    // console.log(ccMap)
+    // console.log(CC_MAP)
     let i = 0;
-    for (let item in ccMap) {
+    for (let item in CC_MAP) {
         let control = document.createElement('div');
-        control.className = 'controls ' + ccMap[item]['type'];
+        control.className = 'controls ' + CC_MAP[item]['type'];
         control.className += (item < 77) || (item > 96) ? ' encoder' : ' slider'
         control.id = 'control_' + item;
         control.innerHTML = `
-            <label>${ccMap[item]['name']} (${ccMap[item]['range'].length})</label>
-            <input type="range" min="0" max="${ccMap[item]['range'].length}">
+            <label>${CC_MAP[item]['name']} (${CC_MAP[item]['range'].length - 1})</label>
+            <input type="range" min="0" max="${CC_MAP[item]['range'].length - 1}">
             <span></span>
         `;
         document.body.appendChild(control);
@@ -369,18 +52,23 @@ function listenViewport() {
         el.addEventListener('input', (e) => {
             // console.log('change',e.target.value);
             e.target.parentNode.querySelector('span').innerText = e.target.value;
+            let cc = e.target.parentNode.getAttribute("id").split("_")[1];
+            console.log('CC: ' + cc, 'VALUE: ' + e.target.value);
+            sendToJuno(cc, e.target.value)
         });
     });
 
+    // Add click events to pads
     document.querySelectorAll('.controls.button').forEach((el) => {
         el.addEventListener('click', (e) => {
-            // TODO: play the appropriate note
             if (!e.target.getAttribute('data-note').includes('oct')) {
                 if (e.target.getAttribute('data-note').length > 0) {
                     let note = e.target.getAttribute('data-note') + current_octave;
-                    juno.playNote(note)
+                    if (juno) juno.playNote(note);
+                    if (launchResponse) launchResponse.playNote(note); // show the played note on the LC XL
                 } else {
                     // the empty button. what should it do?
+                    // for now it just displays the currently selected Octave
                 }
             } else {
                 // its the octave buttons
@@ -395,7 +83,6 @@ function listenViewport() {
                         current_octave = current_octave + 1;
                     }
                 }
-                // TODO: change color of octave buttons on LCXL based on what octave it's in
                 /*
                 oct 1 oct + is green oct - is red
                 oct 2 oct + is green oct - is orange
@@ -410,88 +97,173 @@ function listenViewport() {
     });
 }
 
+function sendToJuno(cc, value) {
+    // console.log(`channel: ${channel} controller: ${cc} value: ${value}`);
+    document.querySelector(`#control_${cc} > span`).innerText = value;
+    // console.log(CC_MAP[cc]);
+    document.querySelector('.active').innerHTML = `
+        ${CC_MAP[cc]['name']}: 
+        <span class='value'>${value}</span>
+        <small>${CC_MAP[cc]['desc']}</small>
+        MIDI Channel: ${channel}
+    `;
+    // let sysex = `0x36 0x00 0x23 0x01 0x01 0x${CC_MAP[cc]['sysex']} 0x${decimalToHex(value)}`; //.replace(/\s/g,'');
+    // // console.log('sysex ' + sysex, hexStringToByte(sysex));
+    // // let result = juno.sendSysex(0x41,[0x36, 0x00, 0x23, 0x20, 0x01, 8, 127]);
+    // sys = sysex.split(' ')
+    // console.log(sys);
+    let mappedControllerInt = hexStringToByte(CC_MAP[cc]['sysex'])[0];
+    let arr = [54, 8, 35, 32, 1, mappedControllerInt, value];
+    // console.log('arr', arr);
+    // console.log('ev', ev);
+    juno.sendSysex(0x41, arr);
+}
+
+// Receives a note number and lights up the LC XL and screen with appropriate colors
+// Also adjusts current_octave
+function octaveButtonAction(note_number) {
+    // Up octave
+    if (note_number == 60) {
+        current_octave++;
+        document.querySelector("#pad_0").setAttribute("data-oct", current_octave)
+        document.querySelector("#pad_7").setAttribute("data-oct", current_octave)
+    }
+
+    // Down octave
+    if (note_number == 41) {
+        current_octave--;
+        document.querySelector("#pad_0").setAttribute("data-oct", current_octave)
+        document.querySelector("#pad_7").setAttribute("data-oct", current_octave)
+    }
+
+    // Middle button resets to center octave
+    if (note_number == 44) {
+        current_octave = 4
+    }
+
+    document.querySelector("#pad_3 > span").innerText = "OCTAVE " + current_octave;
+
+    if (current_octave === 4) {
+        playColor(60, VEL_D_GREEN);
+        playColor(41, VEL_D_GREEN);
+    } else if (current_octave === 3) {
+        playColor(60, VEL_D_GREEN);
+        playColor(41, VEL_YELLOW);
+    } else if (current_octave === 2) {
+        playColor(60, VEL_D_GREEN);
+        playColor(41, VEL_D_AMBER);
+    } else if (current_octave === 1) {
+        playColor(60, VEL_D_GREEN);
+        playColor(41, VEL_D_RED);
+    } else if (current_octave === 0) {
+        playColor(60, VEL_D_GREEN);
+        playColor(41, VEL_OFF);
+    } else if (current_octave === 5) {
+        playColor(41, VEL_D_GREEN);
+        playColor(60, VEL_YELLOW);
+    } else if (current_octave === 6) {
+        playColor(41, VEL_D_GREEN);
+        playColor(60, VEL_D_AMBER);
+    } else if (current_octave === 7) {
+        playColor(41, VEL_D_GREEN);
+        playColor(60, VEL_D_RED);
+    } else if (current_octave === 8) {
+        playColor(41, VEL_D_GREEN);
+        playColor(60, VEL_OFF);
+    }
+}
+
+function octUp(note) {
+    // if the note is button 16, it should play the "C" one octave above the "C" on button 9
+    return note == 92 ? 1 : 0;
+}
+
+// based on the 2, 4, or 6 range (all that we are worried about right now)
+// return the "appropriate" value based on the raw encoder value
+function fullToRange(range, rawValue) {
+    /*
+    Range of 2:
+    RAW VALUE | RETURN VALUE
+    ==========|=============
+      0 - 63  | 0
+     64 - 127 | 1
+
+    Range of 4:
+    RAW VALUE | RETURN VALUE
+    ==========|=============
+      0 - 31  | 0
+     32 - 63  | 1
+     64 - 95  | 2
+     96 - 127 | 3
+
+     Range of 6:
+     RAW VALUE | RETURN VALUE
+     ==========|=============
+       0 - 20  | 0
+      21 - 42  | 1
+      43 - 63  | 2
+      64 - 84  | 3
+      85 - 106 | 4
+     107 - 127 | 5
+
+    */
+    if (range.length === 2) {
+        return rawValue < 64 ? 0 : 1;
+    } else if (range.length === 4) {
+        if (rawValue < 32) {
+            return 0;
+        } else if (rawValue < 64) {
+            return 1;
+        } else if (rawValue < 96) {
+            return 2;
+        } else {
+            return 3;
+        }
+    } else if (range.length === 6) {
+        if (rawValue < 21) {
+            return 0;
+        } else if (rawValue < 43) {
+            return 1;
+        } else if (rawValue < 64) {
+            return 2;
+        } else if (rawValue < 85) {
+            return 3;
+        } else if (rawValue < 107) {
+            return 4;
+        } else {
+            return 5;
+        }
+    } else {
+        return rawValue;
+    }
+}
+
+function updateViewPort(cc, newValue) {
+    document.querySelector(`#control_${cc} > input[type="range"]`).value = newValue;
+    document.querySelector(`#control_${cc} > span`).innerText = newValue;
+}
+
+// Sets up listeners for CC changes, note on, note off, including responding to panic and octave buttons
+// TODO: this listens to the LC XL, we need this same thing to listen to the web app controls
 function listenProgrammer() {
     programmer.addListener('controlchange', 'all', function(ev) {
-        // console.log(`channel: ${ev.channel} controller: ${ev.controller.number} value: ${ev.value}`);
-        document.querySelector(`#control_${ev.controller.number} > span`).innerText = ev.value;
-        console.log(ccMap[ev.controller.number]);
-        document.querySelector('.active').innerHTML = `
-            ${ccMap[ev.controller.number]['name']}: 
-            <span class='value'>${ev.value}</span>
-            <small>${ccMap[ev.controller.number]['desc']}</small>
-            MIDI Channel: ${ev.channel}
-        `;
-        let sysex = `0x36 0x00 0x23 0x01 0x01 0x${ccMap[ev.controller.number]['sysex']} 0x${decimalToHex(ev.value)}`; //.replace(/\s/g,'');
-        // console.log('sysex ' + sysex, hexStringToByte(sysex));
-        // let result = juno.sendSysex(0x41,[0x36, 0x00, 0x23, 0x20, 0x01, 8, 127]);
-        sys = sysex.split(' ')
-        console.log(sys);
-        let mappedControllerInt = hexStringToByte(ccMap[ev.controller.number]['sysex'])[0];
-        let arr = [54, 8, 35, 32, 1, mappedControllerInt, ev.value];
-        console.log('arr', arr);
-        console.log('ev', ev);
-        let result = juno.sendSysex(0x41, arr);
-        console.log(result)
+        // TODO: constrain the value to stay in the range allowed with CC_MAP[cc]['range']
+        let cc = ev.controller.number;
+        let range = CC_MAP[cc]['range'];
+        let rawValue = ev.value;
+        let safeValue = fullToRange(range, rawValue);
+        console.log(`CC: ${cc} | Raw Value" ${rawValue} | Range: ${range} | Safe Value: ${safeValue}`)
+        sendToJuno(cc, safeValue);
+        updateViewPort(cc, safeValue);
     });
 
     programmer.addListener('noteon', 'all', (ev) => {
         console.log('ev', ev);
-        console.log('note', noteMap[ev.note.number]["note"] + current_octave)
-        if (noteMap[ev.note.number]["note"]) {
-            let octUp = ev.note.number == 92 ? 1 : 0;
-            juno.playNote(noteMap[ev.note.number]["note"] + (current_octave + octUp));
+        console.log('note', NOTE_MAP[ev.note.number]["note"] + current_octave)
+        if (NOTE_MAP[ev.note.number]["note"]) {
+            juno.playNote(NOTE_MAP[ev.note.number]["note"] + (current_octave + octUp(ev.note.number)));
         }
-
-        // Up octave
-        if (ev.note.number == 60) {
-            current_octave++;
-            document.querySelector("#pad_0").setAttribute("data-oct", current_octave)
-            document.querySelector("#pad_7").setAttribute("data-oct", current_octave)
-        }
-
-        // Down octave
-        if (ev.note.number == 41) {
-            current_octave--;
-            document.querySelector("#pad_0").setAttribute("data-oct", current_octave)
-            document.querySelector("#pad_7").setAttribute("data-oct", current_octave)
-        }
-
-        // Middle button resets to center octave
-        if (ev.note.number == 44) {
-            current_octave = 4
-        }
-
-        document.querySelector("#pad_3 > span").innerText = "OCTAVE " + current_octave;
-
-        if (current_octave === 4) {
-            playColor(60, VEL_D_GREEN);
-            playColor(41, VEL_D_GREEN);
-        } else if (current_octave === 3) {
-            playColor(60, VEL_D_GREEN);
-            playColor(41, VEL_YELLOW);
-        } else if (current_octave === 2) {
-            playColor(60, VEL_D_GREEN);
-            playColor(41, VEL_D_AMBER);
-        } else if (current_octave === 1) {
-            playColor(60, VEL_D_GREEN);
-            playColor(41, VEL_D_RED);
-        } else if (current_octave === 0) {
-            playColor(60, VEL_D_GREEN);
-            playColor(41, VEL_OFF);
-        } else if (current_octave === 5) {
-            playColor(41, VEL_D_GREEN);
-            playColor(60, VEL_YELLOW);
-        } else if (current_octave === 6) {
-            playColor(41, VEL_D_GREEN);
-            playColor(60, VEL_D_AMBER);
-        } else if (current_octave === 7) {
-            playColor(41, VEL_D_GREEN);
-            playColor(60, VEL_D_RED);
-        } else if (current_octave === 8) {
-            playColor(41, VEL_D_GREEN);
-            playColor(60, VEL_OFF);
-        }
-
+        octaveButtonAction(ev.note.number);
         // Panic
         if (ev.note.number == 105) {
             panic();
@@ -499,60 +271,8 @@ function listenProgrammer() {
     });
 
     programmer.addListener('noteoff', 'all', (ev) => {
-        let octUp = ev.note.number == 92 ? 1 : 0;
-        juno.stopNote(noteMap[ev.note.number]["note"] + (current_octave + octUp));
+        juno.stopNote(NOTE_MAP[ev.note.number]["note"] + (current_octave + octUp(ev.note.number)));
     });
-}
-/*
-F0 [Exclusive]
-41 [Roland ID#]
-36 [Individual Tone Parameters]
-0N [N=MIDI channel (N=0-F, Chan 1=00 Chan 16=0F)]
-23 [Format type]
-20 [unknown]
-01 [unknown]
-XX [Parameter number (0-23)] see table below
-YY [Value (0-127)] Can be left at 00
-F7 [End of Exclusive]
-*/
-function decimalToHex(d) {
-    var hex = Number(d).toString(16);
-    hex = "00".substr(0, 2 - hex.length) + hex;
-    return hex;
-}
-
-function hexStringToByte(str) {
-    if (!str) {
-        return new Uint8Array();
-    }
-
-    var a = [];
-    for (var i = 0, len = str.length; i < len; i += 2) {
-        a.push(parseInt(str.substr(i, 2), 16));
-    }
-
-    return new Int8Array(a);
-}
-
-function playJ() {
-    let button = document.createElement('button');
-    let panicB = document.createElement('button');
-    button.innerText = "Play";
-    panicB.innerText = "Panic";
-    panicB.addEventListener('click', panic);
-
-    // button.addEventListener('click', () => panic());
-    button.addEventListener('click', function() {
-        juno.playNote('c3', 1).stopNote('c3', 1, { time: 11600 })
-        juno.playNote("G5", 1)
-            .sendPitchBend(-0.5, 1, { time: 400 }) // After 400 ms.
-            .sendPitchBend(0.5, 1, { time: 800 }) // After 800 ms.
-            .stopNote("G5", 1, { time: 11200 }); // After 1.2 s.
-
-        console.log('ffff');
-    })
-    document.body.appendChild(button);
-    document.body.appendChild(panicB);
 }
 
 function launchResponseDefaults() {
@@ -564,12 +284,7 @@ function launchResponseDefaults() {
     // panic has to send sysex not note info (since playing the note would also turn off the note)
     launchResponse.sendSysex(0x00, [32, 41, 2, 17, 120, 8, 40, 127]);
 
-    // set the knob colors
-    const BLACK = CHO = 0;
-    const RED = VCA = 10;
-    const YELLOW = VCF = 125;
-    const AMBER = DCO = 30;
-    const GREEN = LFO = 120;
+    //first row
     launchResponse.sendSysex(0x00, [32, 41, 2, 17, 120, 8, 0, LFO]);
     launchResponse.sendSysex(0x00, [32, 41, 2, 17, 120, 8, 1, LFO]);
     launchResponse.sendSysex(0x00, [32, 41, 2, 17, 120, 8, 2, DCO]);
@@ -611,13 +326,21 @@ WebMidi.enable(function(err) {
     } else {
         console.log(WebMidi.inputs);
         console.log(WebMidi.outputs);
+        buildUI();
+
+        // instantiate the MIDI inputs and outputs
         programmer = WebMidi.getInputByName('Launch Control XL');
         juno = WebMidi.getOutputByName('mio');
         launchResponse = WebMidi.getOutputByName('Launch Control XL');
-        launchResponseDefaults();
-        buildUI();
-        listenProgrammer();
+
+        // if they are connected, instantiate the listeners and defaults
+        if (launchResponse) {
+            launchResponseDefaults();
+        }
+
+        if (programmer) {
+            listenProgrammer();
+        }
         listenViewport();
-        playJ();
     }
 }, true);
