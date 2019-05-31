@@ -1,0 +1,179 @@
+:root {
+    --amber: orange;
+    --yellow: yellow;
+    --red: red;
+    --green: green;
+    --black: #333333;
+    --box-size: 76px;
+    --slide-height: calc(var(--box-size) * 2);
+    --lfo-color: var(--green);
+    --dco-color: var(--amber);
+    --vca-color: var(--red);
+    --vcf-color: var(--yellow);
+    --cho-color: var(--black);
+    --env-color: #666666;
+    --btn-color: #246;
+    --black-key: #333;
+    --white-key: #eee;
+}
+
+html,
+body {
+    background-color: black;
+    font-family: sans-serif;
+    font-size: 16px;
+    margin: 0 auto;
+    width: calc(var(--box-size) * 10); // constrain the width
+}
+
+.controls {
+    background-color: var(--env-color);
+    border: 1px transparent solid;
+    color: #fff;
+    text-shadow: 0 0 3px #333;
+    display: inline-block;
+    margin: .3rem .5rem;
+    position: relative;
+    width: var(--box-size);
+}
+
+.encoder {
+    height: var(--box-size);
+}
+
+.slider {
+    height: var(--slide-height);
+}
+
+.button {
+    background-color: var(--btn-color);
+    border-radius: .5rem;
+    cursor: pointer;
+    height: calc(var(--box-size) / 2);
+}
+
+.button:hover {
+    border-color: #fff;
+    opacity: 0.7;
+}
+
+.button:active {
+    background-color: red;
+}
+
+.controls>input[type="range"] {
+    position: absolute;
+    top: 40px;
+    width: calc(var(--box-size) - 4px);
+}
+
+.controls>span {
+    bottom: 2px;
+    position: absolute;
+    right: 2px;
+}
+
+.controls>label {
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+}
+
+.vcf {
+    background-color: var(--vcf-color)
+}
+
+.dco {
+    background-color: var(--dco-color);
+}
+
+.cho {
+    background-color: var(--cho-color);
+}
+
+.lfo {
+    background-color: var(--lfo-color);
+}
+
+.vca {
+    background-color: var(--vca-color);
+}
+
+.active {
+    color: #fff;
+    height: 20px;
+    /* margin-left: .5rem; */
+    text-align: right;
+}
+
+.value {
+    font-weight: 700;
+    color: pink;
+}
+
+.logo {
+    margin-bottom: -1rem;
+    margin-left: .5rem;
+    margin-top: 1rem;
+}
+
+.black-keys {
+    background-color: var(--black-key);
+}
+
+.white-keys {
+    background-color: var(--white-key);
+    color: var(--black-key);
+}
+
+#pad_0.button[data-oct="0"] {
+    background-color: var(--black);
+}
+
+#pad_0.button[data-oct="1"] {
+    background-color: var(--red);
+}
+
+#pad_0.button[data-oct="2"] {
+    background-color: var(--amber);
+}
+
+#pad_0.button[data-oct="3"] {
+    background-color: var(--yellow);
+}
+
+#pad_0.button[data-oct="4"],
+#pad_0.button[data-oct="5"],
+#pad_0.button[data-oct="6"],
+#pad_0.button[data-oct="7"],
+#pad_0.button[data-oct="8"] {
+    background-color: var(--green);
+}
+
+#pad_7.button[data-oct="8"] {
+    background-color: var(--black);
+}
+
+#pad_7.button[data-oct="7"] {
+    background-color: var(--red);
+}
+
+#pad_7.button[data-oct="6"] {
+    background-color: var(--amber);
+}
+
+#pad_7.button[data-oct="5"] {
+    background-color: var(--yellow);
+}
+
+#pad_0,
+#pad_7,
+#pad_7.button[data-oct="4"],
+#pad_7.button[data-oct="3"],
+#pad_7.button[data-oct="2"],
+#pad_7.button[data-oct="1"] {
+    background-color: var(--green);
+}
